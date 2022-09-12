@@ -1,6 +1,19 @@
 ---
 title: "Redes Neurais Artificiais - Aula 4"
-format: html
+subtitle: Extreme Learning Machines (ELM)
+author: Gustavo Vieira Maia
+editor:
+    render-on-save: true
+lang: en
+format:
+    html:
+        theme: cosmo
+        toc: true
+        number-sections: true
+        color-links: true
+        geometry:
+            - left=30mm
+            - right=30mm
 ---
 
 # Import Relevant Libraries
@@ -15,5 +28,179 @@ from sklearn.metrics import classification_report
 # Extreme Learning Machines (ELM)
 
 $$
-X_{(N, n)} \xrightarrow{Z} H_{(n, p)} \xrightarrow{w_{(p, 1)}} y_{(N, 1)}
+X_{(N, n)} \xrightarrow{Z_{n, p}} H_{(n, p)} \xrightarrow{w_{(p, 1)}} y_{(N, 1)}
 $$
+
+## Test ELM
+
+### Set parameters
+
+```{python}
+std_dev = 1.2
+neurons_hidden = 10
+neurons_output = 1
+n_samples = 50
+```
+
+### Generate nonlinearly separable dataset
+
+```{python}
+class_0 = np.vstack([
+    (
+        np.random.normal(size=(n_samples, 2), scale=std_dev)
+        + np.tile([2, 2], n_samples).reshape(-1, 2)
+    ),
+    (
+        np.random.normal(size=(n_samples, 2), scale=std_dev)
+        - np.tile([2, 2], n_samples).reshape(-1, 2)
+    )
+])
+
+class_1 = np.vstack([
+    (
+        np.random.normal(size=(n_samples, 2), scale=std_dev)
+        + np.tile([2, -2], n_samples).reshape(-1, 2)
+    ),
+    (
+        np.random.normal(size=(n_samples, 2), scale=std_dev)
+        + np.tile([-2, 2], n_samples).reshape(-1, 2)
+    )
+])
+
+data = np.vstack([class_0, class_1])
+target = np.repeat([-1, 1], repeats=n_samples * 2).reshape(-1, 1)
+data.shape, target.shape
+```
+
+```{python}
+plt.figure()
+plt.scatter(data[:, 0], data[:, 1], c=target)
+plt.show()
+plt.close()
+```
+
+**Generate random weights for input data**
+
+```{python}
+input_weights = np.random.uniform(size=(data.shape[1] + 1, neurons_hidden))
+input_weights.shape
+```
+
+**Transform data with non-linear activation function**
+
+```{python}
+hidden_input = np.dot(
+    np.hstack([np.ones(shape=(data.shape[0], 1)), data]),
+    input_weights
+)
+hidden_input.shape
+```
+
+```{python}
+hidden_output = np.tanh(hidden_input)
+hidden_output = np.hstack([np.ones(shape=(data.shape[0], 1)), hidden_output])
+hidden_output.shape
+```
+
+**Calculate output layer weights**
+
+```{python}
+output_weights = np.dot(
+    np.linalg.pinv(hidden_output),
+    target
+)
+output_weights.shape
+```
+
+**Calculate network output**
+
+```{python}
+output_input = np.dot(
+    hidden_output,
+    output_weights
+)
+output_input.shape
+```
+
+Apply linear function to activate output neuron
+
+```{python}
+output_output = output_input * 1
+```
+
+**Evaluate classification results**
+
+```{python}
+print(classification_report(output_output > 0, target > 0))
+```
+
+## ELM Model Class
+
+```{python}
+class ELMClassifier:
+    def __init__(self, neurons: int, seed: int = 0):
+        self.neurons = neurons
+        self.seed = seed
+
+    def fit(self, X, y):
+        # GENERATE RANDOM HIDDEN LAYER WEIGHTS
+        self.input_weights_ = np.random.uniform(size=(X.shape[1] + 1, self.neurons))
+
+        return self
+
+    def predict(self, X):
+        # CALCULATE HIDDEN LAYER INPUT
+        hidden_input = np.dot(
+            np.hstack([np.ones(shape=(data.shape[0], 1)), data]),
+            self.input_weights_
+        )
+
+        # CALCULATE HIDDEN LAYER OUTPUT
+        hidden_output = np.tanh(hidden_input)
+        hidden_output = np.hstack([np.ones(shape=(X.shape[0], 1)), hidden_output])
+        
+        # CALCULATE OUTPUT LAYER WEIGHTS
+        output_weights = np.dot(
+            np.linalg.pinv(hidden_output),
+            target
+        )
+
+        output_input = np.dot(
+            hidden_output,
+            output_weights
+        )
+
+        return output_input.reshape(-1, 1)
+```
+
+**Evaluate `ELMClassifier`**
+
+```{python}
+model = ELMClassifier(neurons=10)
+model.fit(data, target)
+preds = model.predict(data)
+print(classification_report(y_pred=preds > 0, y_true=target > 0))
+```
+
+**Test multiple number of hidden layer neurons to find the optimal value**
+
+```{python}
+res = list()
+for i in range(2, 100):
+    model = ELMClassifier(neurons=i)
+    model.fit(data, target)
+    preds = model.predict(data)
+    res.append({
+        'neurons': i,
+        'report': classification_report(y_pred=preds > 0, y_true=target > 0, output_dict=True)
+    })
+
+df_res = pd.json_normalize(res)
+```
+
+```{python}
+plt.figure()
+plt.scatter(df_res['neurons'], df_res['report.accuracy'])
+plt.show()
+plt.close()
+```

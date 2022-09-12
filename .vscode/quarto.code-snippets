@@ -3,6 +3,7 @@
 		"prefix": "python",
 		"body": [
 			"```{python}",
+			"$0",
 			"```"
 		],
 		"description": "Insert code cell for Python code"
