@@ -1,0 +1,87 @@
+---
+title: "Redes Neurais Artificiais - Exercício 1"
+author: Gustavo Vieira Maia
+editor:
+    render-on-save: true
+lang: pt-br
+format:
+    pdf:
+        toc: true
+        number-sections: true
+        color-links: true
+        geometry:
+            - left=30mm
+            - right=30mm
+---
+
+<div id="toc"></div>
+
+\newpage
+
+# Objetivo
+
+Selecionar um dos artigos referenciados na seção Histórico das Notas de Aula e elaborar um texto, de até três páginas, contendo um resumo e uma análise crítica do artigo.
+
+# Artigo Selecionado
+
+Huang, Guang-Bin, Qin-Yu Zhu, and Chee-Kheong Siew. **"Extreme learning machine: a new learning scheme of feedforward neural networks."** *2004 IEEE international joint conference on neural networks (IEEE Cat. No. 04CH37541).* Vol. 2. Ieee, 2004.
+
+# Resumo e Análise
+
+Redes neurais artificiais em sua essência são modelos de aprendizado de máquina que utilizam de técnicas de representação não linear dos dados de entrada em um espaço de características intermediário que é utilizado para o real objetivo de classificação ou regressão. O método clássico de aprendizado é baseado em cálculo do gradiente da função objetivo para encontrar o caminho que reduz o erro do modelo de forma iterativa. Entretanto tal metodologia pode ser lenta e dependente de diversos hiperparâmetros.
+
+A proposta da metodologia mais utilizada é portanto atualizar tanto os pesos das entradas os neurônios quanto o resutado da saída a medida que o erro é avaliado e propagado utilizando *backpropagation* (BP).
+
+O artigo selecionado apresenta uma nova metodologia de construção de modelos de redes neurais artificiais que não somente acelera o processamento evitando a parte iterativa do processo como também melhora a qualidade das predições encontradas pelo modelo.
+
+A idea proposta para *Extreme Learning Machine* (ELM) é de:
+
+* Definição de forma aleatória da matriz de pesos de entrada da camada escondida
+* Aumento considerável da dimensão do espaço da camada escondida
+* Construção de solução que apresenta erro mínimo e margem máxima
+
+
+## Definição do Modelo
+
+Dada uma rede neural descrita por:
+
+$$
+x \xrightarrow{\textbf{Z}} \textbf{H} \xrightarrow{\textbf{W}} y
+$$
+
+Em que:
+
+* $x$: matriz dos dados de entrada
+* $\textbf{Z}$: matriz de pesos para a camada escondida
+* $\textbf{H}$: matriz de resultados da camada escondida
+* $\textbf{W}$: matriz de pesos da camada de saída
+* $y$: resultado do modelo
+
+A proposta da ELM é de gerar uma matriz $\textbf{Z}$ aleatória e com dimensões consideravelmente maiores que a dimensão de entrada para transformar. Desse modo a matriz $\textbf{H} = \phi_h(x\textbf{Z})$ (dado $\phi_h$ a função de ativação não linear dos neurônios da camada escondida) é uma representação não linear dos dados de entrada em um novo espaço.
+
+Assim o cálculo da saída do modelo será $\phi_o(\textbf{H} \textbf{W}) = y$ (dado $\phi_o$ a função de ativação dos neurônios de saída) e, no caso em que $\phi_o$ é uma função linear $y=x$ a equação do $y$ pode ser simplificada como $\textbf{W} = \textbf{H}^{-1} y$ e assim os valores dos pesos dos neurônios de saída são definidos em um único passo ao calcular a inversa da matriz $\textbf{H}$. De modo a simplificar mais ainda a metodologia, é proposto utilizar a metodologia de Moore-Penrose *generalized inverse* para cálculo da inversa de uma matriz que pode ser singular e não necessariamente quadrada: $\textbf{A}^{-1} \approx \textbf{A}^+$ acelerando ainda mais o ajuste do modelo.
+
+## Objetivos
+
+O artigo apresenta objetivos bastante claros quanto a melhoria de performance das predições do modelo quanto de performance de execução. A proposta é de:
+
+* evitar o uso de algoritmos iterativos que dependem de uma seleção bem feita da taxa de aprendizado
+    * uma taxa muito elevada pode gerar um modelo instável que não converge
+    * uma taxa muito baixa pode gerar um modelo lento que demora a convergir
+* transformar o espaço de entrada em um espaço que garante uma solução linear do modelo
+* evitar uso de *backpropagation* que pode alcançar resultados sobre ajustados com baixa performance de generalização
+* determinação de modelo analiticamente garantindo alta performance computacional
+
+## Testes e Comparações
+
+O modelo proposto foi testado em três bases de dados diferentes apresentando resultados consideravelmente bons quando comparado a uma rede neural artificial de uma única camada escondida treinada com *backpropagation* (SLFN) e um algoritmo de máquina de vetores de suporte (SVM). 
+
+Nota-se que a qualidade da previsão do modelo ELM é ligeiramente melhor que os outros modelos nos testes apresentados e que quando bem ajustado pode até mesmo ter melhor performance de generalização do que os outros modelos. Entretanto a maior contribuição é certamenteo a performance computacional em que o modelo alcança resutados até centenas de vezes melhores que os outros modelos testados.
+
+# Considerações Finais
+
+A simplificação da metodologia para expandir o espaço de característica de forma aleatória e a definição analítica dos pesos da camada de saída representam melhora importante para o tempo de execução de casos de uso com bases de dados com elevado número de observações. A alta performance computacional e a alta qualidade das previsões torna ELM uma metodologia competitiva para construção de modelo de aprendizado de máquina.
+
+Apesar da frequente afirmação de que a metodologia é mais resistente a problemas de sobreajuste, ELMs com número exagerado de dimensões no espaço de caracteristicas não linear da camada escondida podem obter baixa performance de generalização e sobreajustar aos dados disponíveis. Em casos de baixa dimensionalidade de características e baixa quantidade de observações esse problema se torna relevante dado que um elevado número de neurônios na camada escondida determina um elevado número de parâmetros e potencialmente baixa generalização.
+
+Um ponto bastante relevante que comunica com estratégias atuais de aprendizado de máquina para redes de aprendizado profundo que ELMs já identificaram há bastante tempo é que aplicações de redes neurais *feedforward* não necessariamente precisam de ajustar os pesos das camadas escondidas. Contanto que exista metodologia que encontre esses pesos de forma a transformar o espaço de entrada em um novo espaço de características de melhor qualidade para o objetivo do modelo, então o modelo pode apresentar alta performance. Atualmente é bastante comum encontrar estratégias de transferência de aprendizado em redes de aprendizado profundo. O conhecimento encontrado pela iteração e ajuste de um problema estabelece pesos para as camadas de uma rede neural que podem ser transpostos para outra rede que resolve outro problema aparentemente descorrelacionado. O resultado é uma rede que não demora para ser treinada e apresenta resultados bons para o pouco esforço empregado.

@@ -177,3 +177,8 @@ vignettes/*.pdf
 # ZIP
 *.zip
 
+####################################
+
+*_files
+libs
+*.html
