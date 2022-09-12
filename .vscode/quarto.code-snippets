@@ -1,0 +1,10 @@
+{
+	"insert-code-python": {
+		"prefix": "python",
+		"body": [
+			"```{python}",
+			"```"
+		],
+		"description": "Insert code cell for Python code"
+	}
+}
