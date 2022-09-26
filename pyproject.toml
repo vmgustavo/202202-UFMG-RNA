@@ -4,7 +4,6 @@ version = "0.1.0"
 description = ""
 authors = ["Gustavo Maia"]
 readme = "README.md"
-packages = [{include = "202202_ufmg_rna"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
@@ -13,7 +12,6 @@ matplotlib = "^3.5.3"
 pandas = "^1.4.4"
 jupyter = "^1.0.0"
 scikit-learn = "^1.1.2"
-
 
 [build-system]
 requires = ["poetry-core"]
