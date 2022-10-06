@@ -17,7 +17,7 @@ def main():
     dataset_opts = (
         (f"linear__{n_obs}_obs__{n_feats}_feats", get_linear(n_obs, n_feats)),
         (f"blobs__{n_obs}_obs__{n_feats}_feats", get_blobs(n_obs, n_feats)),
-        (f"moons__{n_obs}_obs__{n_feats}_feats", get_moons(n_obs))
+        (f"moons__{n_obs}_obs", get_moons(n_obs))
     )
 
     results = list()
