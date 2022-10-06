@@ -75,7 +75,7 @@ class ELMPCAClassifier(ClassifierMixin, BaseEstimator):
         return output_input.reshape(-1) > 0
 
 
-class ELMCRegClassifier(ClassifierMixin, BaseEstimator):
+class ELMRegClassifier(ClassifierMixin, BaseEstimator):
     w_input_: np.array
     w_output_: np.array
 

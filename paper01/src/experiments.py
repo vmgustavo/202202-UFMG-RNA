@@ -8,7 +8,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 
 from datasets import get_linear, get_blobs, get_moons
-from models import ELMClassifier, ELMCRegClassifier, ELMPCAClassifier
+from models import ELMClassifier, ELMRegClassifier, ELMPCAClassifier
 
 
 def main():
@@ -28,7 +28,7 @@ def main():
         for neurons in tqdm(range(2, 256, 10), desc="neurons"):
             model_opts = (
                 ELMClassifier(neurons=neurons),
-                ELMCRegClassifier(neurons=neurons),
+                ELMRegClassifier(neurons=neurons),
                 ELMPCAClassifier(neurons=neurons)
             )
 
