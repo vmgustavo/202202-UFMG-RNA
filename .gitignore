@@ -182,3 +182,4 @@ vignettes/*.pdf
 *_files
 libs
 *.html
+.idea
