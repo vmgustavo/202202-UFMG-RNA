@@ -65,7 +65,7 @@ def main():
 
     (
         pd.json_normalize(results)
-        .to_csv(f"results__{datetime.now().timestamp()}.csv", index=False)
+        .to_csv(f"results__{int(datetime.now().timestamp())}.csv", index=False)
     )
 
 
