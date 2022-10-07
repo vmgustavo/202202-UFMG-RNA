@@ -183,3 +183,4 @@ vignettes/*.pdf
 libs
 *.html
 .idea
+out
