@@ -9,6 +9,7 @@ from sklearn.model_selection import train_test_split
 
 from datasets import get_linear, get_blobs, get_moons
 from models import ELMClassifier, ELMRegClassifier, ELMPCAClassifier
+from plots import decision_boundary
 
 
 def main():
@@ -27,9 +28,12 @@ def main():
 
         for neurons in tqdm(range(2, 256, 10), desc="neurons"):
             model_opts = (
-                ELMClassifier(neurons=neurons),
-                ELMRegClassifier(neurons=neurons),
-                ELMPCAClassifier(neurons=neurons)
+                ('ELM', ELMClassifier(neurons=neurons)),
+                ('ELM + Regularization', Pipeline(steps=[
+                    ('scaler', RobustScaler()),
+                    ('model', ELMRegClassifier(neurons=neurons))
+                ])),
+                ('ELM + PCA', ELMPCAClassifier(neurons=neurons))
             )
 
             for model in model_opts:
@@ -44,9 +48,21 @@ def main():
                     num_rounds=50
                 )
 
+                decision_boundary(
+                    model=model, X=X_train, y=y_train,
+                    savepath=(
+                        "figs/decision_boundary"
+                        + "__train"
+                        + f"__{dataset_name}_dataset"
+                        + f"__{model_name}"
+                        + f"__{neurons}_neurons"
+                        + ".png"
+                    )
+                )
+
                 results.append({
                     "dataset": dataset_name,
-                    "model": model.__class__.__name__,
+                    "model": model_name,
                     "neurons": neurons,
                     "evaluation": {
                         "training": accuracy_score(
