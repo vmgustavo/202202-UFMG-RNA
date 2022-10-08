@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+import hashlib
 from time import time
 from itertools import product
 
@@ -89,7 +90,7 @@ def executor(n_obs: int = 1024, neurons_steps: int = 10):
             if not os.path.exists("results"):
                 os.mkdir("results")
 
-            with open(f"results/{time():.0f}.json", "w") as f:
+            with open(f"results/{hashlib.sha256(str(time()).encode()).hexdigest()}.json", "w") as f:
                 json.dump(results, f, indent=2)
 
 
