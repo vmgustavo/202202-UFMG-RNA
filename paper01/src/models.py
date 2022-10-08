@@ -6,10 +6,12 @@ class ELMPCAClassifier(ClassifierMixin, BaseEstimator):
     w_input_: np.array
     means_: np.array
     eig_vec_: np.array
+    explained_var_: np.array
     w_output_: np.array
 
-    def __init__(self, neurons: int):
+    def __init__(self, neurons: int, expl_var_threshold: float = 0.999):
         self.neurons = neurons
+        self.expl_var_threshold = expl_var_threshold
 
     def fit(self, X, y):
         # generate random hidden layer weights [store input weights]
@@ -32,6 +34,16 @@ class ELMPCAClassifier(ClassifierMixin, BaseEstimator):
         self.means_ = hidden_output.mean(axis=0)
         cov = np.cov((hidden_output - self.means_).T)
         eig_val, self.eig_vec_ = np.linalg.eig(np.round(cov, 5))
+
+        # remove columns based on column weight norm
+        self.explained_var_ = eig_val / np.sum(eig_val)
+        num_var = np.array(sorted(enumerate(self.explained_var_), key=lambda x: x[1], reverse=True))
+        num_var[:, 1] = np.cumsum(num_var[:, 1]) <= self.expl_var_threshold
+        selector_binary = np.array(sorted(num_var, key=lambda x: x[0], reverse=False))[:, 1]
+
+        selector_matrix = np.eye(self.explained_var_.shape[0]) * selector_binary
+
+        self.eig_vec_ = self.eig_vec_ @ selector_matrix
 
         # calculate hidden pca layer output
         pca_input = np.dot(hidden_output - self.means_, self.eig_vec_)
