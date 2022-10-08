@@ -15,6 +15,16 @@ app = typer.Typer()
 
 @app.command()
 def experiment(n_obs: int = 1024, neurons_steps: int = 10):
+    executor(n_obs, neurons_steps)
+
+
+@app.command()
+def repeat(n: int, n_obs: int = 1024, neurons_steps: int = 10):
+    for _ in range(n):
+        executor(n_obs, neurons_steps)
+
+
+def executor(n_obs: int = 1024, neurons_steps: int = 10):
     datasets = [
         (get_linear(n_obs, 2), "linear"),
         (get_blobs(n_obs, 2), "blobs"),
