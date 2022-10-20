@@ -1,9 +1,12 @@
 from io import BytesIO
+from typing import Tuple
+from datetime import timedelta
 
 import requests
 import numpy as np
 import pandas as pd
 from sklearn import datasets
+import requests_cache
 
 
 def get_linear(n_obs: int, n_feats: int):
@@ -39,7 +42,7 @@ def get_moons(n_obs: int):
     return data, target
 
 
-def get_ilpd():
+def get_ilpd() -> Tuple[pd.DataFrame, pd.Series]:
     """ ILPD (Indian Liver Patient Dataset) Data Set
     Data Set Information: This data set contains 416 liver patient records and
     167 non liver patient records. The data set was collected from north east of
@@ -63,8 +66,6 @@ def get_ilpd():
         11. Selector field used to split the data into two sets (labeled by the experts)
 
     Source: https://archive.ics.uci.edu/ml/datasets/ILPD+(Indian+Liver+Patient+Dataset)
-
-    :return:
     """
     url = (
         "https://archive.ics.uci.edu"
@@ -72,7 +73,8 @@ def get_ilpd():
         + "/Indian%20Liver%20Patient%20Dataset%20(ILPD).csv"
     )
 
-    response = requests.get(url)
+    session = requests_cache.CachedSession(cache_name="ilpd", expire_after=timedelta(days=1))
+    response = session.get(url)
 
     memfile = BytesIO()
     memfile.write(response.content)
