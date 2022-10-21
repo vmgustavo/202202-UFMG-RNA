@@ -489,3 +489,41 @@ def get_german_credit() -> Tuple[pd.DataFrame, pd.Series]:
 
     return data, target
 
+
+def get_haberman_survival() -> Tuple[pd.DataFrame, pd.Series]:
+    """Data Set Information: The dataset contains cases from a study that was
+    conducted between 1958 and 1970 at the University of Chicago's Billings
+    Hospital on the survival of patients who had undergone surgery for breast
+    cancer.
+
+    Attribute Information:
+        1. Age of patient at time of operation (numerical)
+        2. Patient's year of operation (year - 1900, numerical)
+        3. Number of positive axillary nodes detected (numerical)
+        4. Survival status (class attribute)
+        -- 1 = the patient survived 5 years or longer
+        -- 2 = the patient died within 5 year
+
+    Source: https://archive.ics.uci.edu/ml/datasets/haberman%27s+survival
+
+    """
+
+    url = (
+            "https://archive.ics.uci.edu"
+            + "/ml/machine-learning-databases/haberman"
+            + "/haberman.data"
+    )
+
+    session = requests_cache.CachedSession(cache_name="statlog", expire_after=timedelta(days=1))
+    response = session.get(url)
+
+    memfile = BytesIO()
+    memfile.write(response.content)
+    memfile.seek(0)
+
+    df = pd.read_csv(memfile, header=None, sep=",")
+    target = df.iloc[:, -1]
+    data = df.iloc[:, :-1]
+    data.columns = ["age", "operation_year", "n_nodes"]
+
+    return data, target
