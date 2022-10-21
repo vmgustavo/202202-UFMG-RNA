@@ -259,3 +259,62 @@ def get_breast_cancer_coimbra() -> Tuple[pd.DataFrame, pd.Series]:
     data = df.iloc[:, :-1]
 
     return data, target
+
+
+def get_breast_cancer_wisconsin() -> Tuple[pd.DataFrame, pd.Series]:
+    """Data Set Information: Features are computed from a digitized image of a
+    fine needle aspirate (FNA) of a breast mass. They describe characteristics
+    of the cell nuclei present in the image. Separating plane described above
+    was obtained using Multisurface Method-Tree (MSM-T) [K. P. Bennett,
+    "Decision Tree Construction Via Linear Programming." Proceedings of the 4th
+    Midwest Artificial Intelligence and Cognitive Science Society, pp. 97-101,
+    1992], a classification method which uses linear programming to construct a
+    decision tree. Relevant features were selected using an exhaustive search in
+    the space of 1-4 features and 1-3 separating planes.
+
+    The actual linear program used to obtain the separating plane in the
+    3-dimensional space is that described in: [K. P. Bennett and
+    O. L. Mangasarian: "Robust Linear Programming Discrimination of Two Linearly
+    Inseparable Sets", Optimization Methods and Software 1, 1992, 23-34].
+
+    #  Attribute                     Domain
+    -- -----------------------------------------
+    1. Sample code number            id number
+    2. Clump Thickness               1 - 10
+    3. Uniformity of Cell Size       1 - 10
+    4. Uniformity of Cell Shape      1 - 10
+    5. Marginal Adhesion             1 - 10
+    6. Single Epithelial Cell Size   1 - 10
+    7. Bare Nuclei                   1 - 10
+    8. Bland Chromatin               1 - 10
+    9. Normal Nucleoli               1 - 10
+    10. Mitoses                      1 - 10
+    11. Class:                       (2 for benign, 4 for malignant)
+
+    Source: https://archive.ics.uci.edu/ml/datasets/breast+cancer+wisconsin+(diagnostic)
+
+    """
+
+    url = (
+            "https://archive.ics.uci.edu"
+            + "/ml/machine-learning-databases/breast-cancer-wisconsin"
+            + "/breast-cancer-wisconsin.data"
+    )
+
+    session = requests_cache.CachedSession(cache_name="statlog", expire_after=timedelta(days=1))
+    response = session.get(url)
+
+    memfile = BytesIO()
+    memfile.write(response.content)
+    memfile.seek(0)
+
+    df = pd.read_csv(memfile, header=None)
+    target = df.iloc[:, -1] - 3
+    data = df.iloc[:, 1:-1]
+    data.columns = [
+        "clump_thickness", "uniformity_cell_size", "uniformity_cell_shape",
+        "marginal_adhesion", "single_epith_cell_size", "bare_nuclei",
+        "bland_chromatin", "normal_nucleioli", "mitoses",
+    ]
+
+    return data, target
