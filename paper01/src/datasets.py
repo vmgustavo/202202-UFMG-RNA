@@ -494,6 +494,21 @@ def get_haberman_survival() -> Tuple[pd.DataFrame, pd.Series]:
     return data, target
 
 
+def alldts() -> dict:
+    return {
+        "linear": get_linear(),
+        "blobs": get_blobs(),
+        "moons": get_moons(),
+        "ilpd": get_ilpd(),
+        "aus_cred": get_australian_credit(),
+        "ger_cred": get_german_credit(),
+        "banknote": get_banknote(),
+        "breast_coimbra": get_breast_cancer_coimbra(),
+        "breast_wiscons": get_breast_cancer_wisconsin(),
+        "haberman_surv": get_haberman_survival()
+    }
+
+
 if __name__ == '__main__':
     # TEST FUNCTIONS EXECUTION
 
