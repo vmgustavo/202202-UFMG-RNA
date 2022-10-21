@@ -139,7 +139,7 @@ def get_australian_credit() -> Tuple[pd.DataFrame, pd.Series]:
     )
 
     df = pd.read_csv(url_request(url, "aus_credit"), header=None, sep=" ")
-    target = df.iloc[:, -1] * 2 - 3
+    target = df.iloc[:, -1] * 2 - 1
 
     data = df.iloc[:, :-1]
     data.columns = [f"A{i}" for i in range(1, data.shape[1] + 1)]
