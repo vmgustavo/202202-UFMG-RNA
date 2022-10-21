@@ -9,7 +9,7 @@ import requests_cache
 from sklearn.preprocessing import OneHotEncoder
 
 
-def get_linear(n_obs: int, n_feats: int):
+def get_linear(n_obs: int, n_feats: int) -> Tuple[pd.DataFrame, pd.Series]:
     data, target = datasets.make_blobs(
         n_samples=n_obs, n_features=n_feats,
         centers=[[-2, -2], [2, 2]],
@@ -19,7 +19,7 @@ def get_linear(n_obs: int, n_feats: int):
     return data, target
 
 
-def get_blobs(n_obs: int, n_feats: int):
+def get_blobs(n_obs: int, n_feats: int) -> Tuple[pd.DataFrame, pd.Series]:
     data, target = datasets.make_blobs(
         n_samples=n_obs, n_features=n_feats,
         centers=[
@@ -32,7 +32,7 @@ def get_blobs(n_obs: int, n_feats: int):
     return data, target
 
 
-def get_moons(n_obs: int):
+def get_moons(n_obs: int) -> Tuple[pd.DataFrame, pd.Series]:
     data, target = datasets.make_moons(
         n_samples=n_obs, noise=0.2,
     )
@@ -169,5 +169,45 @@ def get_statlog() -> Tuple[pd.DataFrame, pd.Series]:
          pd.DataFrame(encoder.fit_transform(cats)).astype("int")],
         axis=1
     )
+
+    return data, target
+
+
+def get_banknote() -> Tuple[pd.DataFrame, pd.Series]:
+    """Data were extracted from images that were taken from genuine and forged
+    banknote-like specimens. For digitization, an industrial camera usually used
+    for print inspection was used. The final images have 400x 400 pixels. Due to
+    the object lens and distance to the investigated object gray-scale pictures
+    with a resolution of about 660 dpi were gained. Wavelet Transform tool were
+    used to extract features from images.
+
+    Attribute Information:
+    1. variance of Wavelet Transformed image (continuous)
+    2. skewness of Wavelet Transformed image (continuous)
+    3. curtosis of Wavelet Transformed image (continuous)
+    4. entropy of image (continuous)
+    5. class (integer)
+
+    Source: https://archive.ics.uci.edu/ml/datasets/banknote+authentication
+
+    """
+
+    url = (
+            "https://archive.ics.uci.edu"
+            + "/ml/machine-learning-databases/00267"
+            + "/data_banknote_authentication.txt"
+    )
+
+    session = requests_cache.CachedSession(cache_name="statlog", expire_after=timedelta(days=1))
+    response = session.get(url)
+
+    memfile = BytesIO()
+    memfile.write(response.content)
+    memfile.seek(0)
+
+    df = pd.read_csv(memfile, header=None, sep=",")
+    target = df.iloc[:, -1] * 2 - 1
+    data = df.iloc[:, :-1]
+    data.columns = ["var", "skew", "kurt", "entropy"]
 
     return data, target
