@@ -23,7 +23,7 @@ def url_request(url: str, name: str) -> BytesIO:
     return memfile
 
 
-def get_linear(n_obs: int = 1000, n_feats: int = 2) -> Tuple[pd.DataFrame, pd.Series]:
+def get_linear(n_obs: int = 2048, n_feats: int = 2) -> Tuple[pd.DataFrame, pd.Series]:
     data, target = datasets.make_blobs(
         n_samples=n_obs, n_features=n_feats,
         centers=[[-2, -2], [2, 2]],
@@ -33,7 +33,7 @@ def get_linear(n_obs: int = 1000, n_feats: int = 2) -> Tuple[pd.DataFrame, pd.Se
     return data, target
 
 
-def get_blobs(n_obs: int = 1000, n_feats: int = 2) -> Tuple[pd.DataFrame, pd.Series]:
+def get_blobs(n_obs: int = 2048, n_feats: int = 2) -> Tuple[pd.DataFrame, pd.Series]:
     data, target = datasets.make_blobs(
         n_samples=n_obs, n_features=n_feats,
         centers=[
@@ -46,7 +46,7 @@ def get_blobs(n_obs: int = 1000, n_feats: int = 2) -> Tuple[pd.DataFrame, pd.Ser
     return data, target
 
 
-def get_moons(n_obs: int = 1000) -> Tuple[pd.DataFrame, pd.Series]:
+def get_moons(n_obs: int = 2048) -> Tuple[pd.DataFrame, pd.Series]:
     data, target = datasets.make_moons(
         n_samples=n_obs, noise=0.2,
     )
