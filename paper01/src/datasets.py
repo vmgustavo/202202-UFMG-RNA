@@ -492,3 +492,14 @@ def get_haberman_survival() -> Tuple[pd.DataFrame, pd.Series]:
     data.columns = ["age", "operation_year", "n_nodes"]
 
     return data, target
+
+
+if __name__ == '__main__':
+    # TEST FUNCTIONS EXECUTION
+
+    import sys
+    from inspect import getmembers, isfunction
+
+    funcs = getmembers(sys.modules[__name__], isfunction)
+    for func in filter(lambda x: x[0].startswith("get_"), funcs):
+        assert isinstance(func[1](), tuple)
