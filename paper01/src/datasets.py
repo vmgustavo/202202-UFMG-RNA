@@ -211,3 +211,51 @@ def get_banknote() -> Tuple[pd.DataFrame, pd.Series]:
     data.columns = ["var", "skew", "kurt", "entropy"]
 
     return data, target
+
+
+def get_breast_cancer_coimbra() -> Tuple[pd.DataFrame, pd.Series]:
+    """Data Set Information: There are 10 predictors, all quantitative, and a
+    binary dependent variable, indicating the presence or absence of breast
+    cancer. The predictors are anthropometric data and parameters which can be
+    gathered in routine blood analysis. Prediction models based on these
+    predictors, if accurate, can potentially be used as a biomarker of breast
+    cancer.
+
+    Attribute Information:
+        Quantitative Attributes:
+        Age (years)
+        BMI (kg/m2)
+        Glucose (mg/dL)
+        Insulin (µU/mL)
+        HOMA
+        Leptin (ng/mL)
+        Adiponectin (µg/mL)
+        Resistin (ng/mL)
+        MCP-1(pg/dL)
+
+        Labels:
+        1=Healthy controls
+        2=Patients
+
+    Source: https://archive.ics.uci.edu/ml/datasets/Breast+Cancer+Coimbra
+
+    """
+
+    url = (
+            "https://archive.ics.uci.edu"
+            + "/ml/machine-learning-databases/00451"
+            + "/dataR2.csv"
+    )
+
+    session = requests_cache.CachedSession(cache_name="statlog", expire_after=timedelta(days=1))
+    response = session.get(url)
+
+    memfile = BytesIO()
+    memfile.write(response.content)
+    memfile.seek(0)
+
+    df = pd.read_csv(memfile, header=0)
+    target = df.iloc[:, -1] * 2 - 1
+    data = df.iloc[:, :-1]
+
+    return data, target
