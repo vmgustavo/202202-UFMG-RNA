@@ -30,7 +30,7 @@ def get_linear(n_obs: int = 2048, n_feats: int = 2) -> Tuple[pd.DataFrame, pd.Se
         cluster_std=1.5,
     )
     target = (target == 1) * 2 - 1
-    return data, target
+    return pd.DataFrame(data), pd.Series(target)
 
 
 def get_blobs(n_obs: int = 2048, n_feats: int = 2) -> Tuple[pd.DataFrame, pd.Series]:
@@ -43,7 +43,7 @@ def get_blobs(n_obs: int = 2048, n_feats: int = 2) -> Tuple[pd.DataFrame, pd.Ser
         cluster_std=1.2,
     )
     target = np.isin(target, [0, 1]) * 2 - 1
-    return data, target
+    return pd.DataFrame(data), pd.Series(target)
 
 
 def get_moons(n_obs: int = 2048) -> Tuple[pd.DataFrame, pd.Series]:
@@ -53,7 +53,7 @@ def get_moons(n_obs: int = 2048) -> Tuple[pd.DataFrame, pd.Series]:
 
     target = (target == 1) * 2 - 1
     data = data - [data[:, 0].mean(), data[:, 1].mean()]
-    return data, target
+    return pd.DataFrame(data), pd.Series(target)
 
 
 def get_ilpd() -> Tuple[pd.DataFrame, pd.Series]:
@@ -242,7 +242,7 @@ def get_breast_cancer_coimbra() -> Tuple[pd.DataFrame, pd.Series]:
     )
 
     df = pd.read_csv(url_request(url, "breast_coimbra"), header=0)
-    target = df.iloc[:, -1] * 2 - 1
+    target = df.iloc[:, -1] * 2 - 3
     data = df.iloc[:, :-1]
 
     return data, target
@@ -489,7 +489,7 @@ def get_haberman_survival() -> Tuple[pd.DataFrame, pd.Series]:
     )
 
     df = pd.read_csv(url_request(url, "haberman_survival"), header=None, sep=",")
-    target = df.iloc[:, -1]
+    target = df.iloc[:, -1] * 2 - 3
     data = df.iloc[:, :-1]
     data.columns = ["age", "operation_year", "n_nodes"]
 
@@ -498,12 +498,12 @@ def get_haberman_survival() -> Tuple[pd.DataFrame, pd.Series]:
 
 def alldts() -> dict:
     return {
-        "linear": get_linear(),
-        "blobs": get_blobs(),
-        "moons": get_moons(),
+        "synth_linear": get_linear(),
+        "synth_blobs": get_blobs(),
+        "synth_moons": get_moons(),
         "ilpd": get_ilpd(),
-        "aus_cred": get_australian_credit(),
-        "ger_cred": get_german_credit(),
+        "cred_aus": get_australian_credit(),
+        "cred_ger": get_german_credit(),
         "banknote": get_banknote(),
         "breast_coimbra": get_breast_cancer_coimbra(),
         "breast_wiscons": get_breast_cancer_wisconsin(),
@@ -519,4 +519,7 @@ if __name__ == '__main__':
 
     funcs = getmembers(sys.modules[__name__], isfunction)
     for func in filter(lambda x: x[0].startswith("get_"), funcs):
-        assert isinstance(func[1](), tuple)
+        print(func[0], end=" ")
+        data_, target_ = func[1]()
+        assert sorted(list(target_.value_counts().index)) == [-1, 1]
+        print("OK")

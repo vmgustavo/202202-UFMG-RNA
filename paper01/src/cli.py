@@ -6,10 +6,11 @@ from time import time
 from itertools import product
 
 import typer
+import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix
 
-from datasets import get_linear, get_blobs, get_moons
+from datasets import alldts
 from models import ELMClassifier, ELMRegClassifier, ELMPCAClassifier
 
 logging.basicConfig(
@@ -24,25 +25,24 @@ app = typer.Typer()
 
 
 @app.command()
-def experiment(n_obs: int = 1024, neurons_steps: int = 10):
-    executor(n_obs, neurons_steps)
+def experiment(neurons_steps: int = 10, neurons: int = None):
+    executor(neurons_steps, neurons)
 
 
 @app.command()
-def repeat(n: int, n_obs: int = 1024, neurons_steps: int = 10):
+def repeat(n: int, neurons_steps: int = 10):
     for _ in range(n):
-        executor(n_obs, neurons_steps)
+        executor(neurons_steps, neurons=None)
 
 
-def executor(n_obs: int = 1024, neurons_steps: int = 10):
-    datasets = [
-        (get_linear(n_obs, 2), "linear"),
-        (get_blobs(n_obs, 2), "blobs"),
-        (get_moons(n_obs), "moons")
-    ]
+def executor(neurons_steps: int = 10, neurons: int = None):
+    datasets = ((k, v) for k, v in alldts().items())
 
-    for dataset, dataset_name in datasets:
-        num_neurons = (2 ** elem for elem in range(neurons_steps + 1, 1, -1))
+    for dataset_name, (data, target) in datasets:
+        if neurons is None:
+            num_neurons = (2 ** elem for elem in range(neurons_steps + 1, 1, -1))
+        else:
+            num_neurons = (neurons, )
 
         models = [
             (ELMClassifier, "ELM"),
@@ -53,10 +53,18 @@ def executor(n_obs: int = 1024, neurons_steps: int = 10):
         for (model_cls, model_name), neurons in product(models, num_neurons):
 
             model = model_cls(neurons=neurons)
-            X_train, X_test, y_train, y_test = train_test_split(*dataset, test_size=.3)
+            X_train, X_test, y_train, y_test = train_test_split(
+                data, target,
+                test_size=.3, stratify=target
+            )
 
             st = time()
-            model.fit(X_train, y_train)
+            try:
+                model.fit(X_train, y_train)
+            except np.linalg.LinAlgError as e:
+                logger.info(f"### Dataset {dataset_name:<15} | Model {model_name:>6} | Neurons {neurons:04d} ###")
+                logger.info(f"Raised np.linalg.LinAlgError: {str(e)}")
+                continue
             time_to_fit = time() - st
 
             pred_train = model.predict(X_train)
@@ -67,7 +75,7 @@ def executor(n_obs: int = 1024, neurons_steps: int = 10):
             acc_train = accuracy_score(y_train > 0, pred_train)
             acc_test = accuracy_score(y_test > 0, pred_test)
 
-            logger.info(f"### Dataset {dataset_name:>6} | Model {model_name:>6} | Neurons {neurons:04d} ###")
+            logger.info(f"### Dataset {dataset_name:<15} | Model {model_name:>6} | Neurons {neurons:04d} ###")
             logger.info(f"True Positive: {tp:04d} | False Negative: {fn:04d}")
             logger.info(f"Accuracy: Train {acc_train:.04f} ; Test {acc_test:.04f}")
             logger.info(f"Accuracy Diff: {acc_test - acc_train:+.04f}")
