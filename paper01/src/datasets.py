@@ -9,6 +9,20 @@ import requests_cache
 from sklearn.preprocessing import OneHotEncoder
 
 
+def url_request(url: str, name: str) -> BytesIO:
+    session = requests_cache.CachedSession(
+        cache_name=name,
+        expire_after=timedelta(days=1)
+    )
+    response = session.get(url)
+
+    memfile = BytesIO()
+    memfile.write(response.content)
+    memfile.seek(0)
+
+    return memfile
+
+
 def get_linear(n_obs: int, n_feats: int) -> Tuple[pd.DataFrame, pd.Series]:
     data, target = datasets.make_blobs(
         n_samples=n_obs, n_features=n_feats,
@@ -73,14 +87,7 @@ def get_ilpd() -> Tuple[pd.DataFrame, pd.Series]:
             + "/Indian%20Liver%20Patient%20Dataset%20(ILPD).csv"
     )
 
-    session = requests_cache.CachedSession(cache_name="ilpd", expire_after=timedelta(days=1))
-    response = session.get(url)
-
-    memfile = BytesIO()
-    memfile.write(response.content)
-    memfile.seek(0)
-
-    df = pd.read_csv(memfile, header=None)
+    df = pd.read_csv(url_request(url, "ilpd"), header=None)
     target = df.iloc[:, -1] * 2 - 3
 
     data = df.iloc[:, 0:-1]
@@ -131,14 +138,7 @@ def get_australian_credit() -> Tuple[pd.DataFrame, pd.Series]:
             + "/australian/australian.dat"
     )
 
-    session = requests_cache.CachedSession(cache_name="statlog", expire_after=timedelta(days=1))
-    response = session.get(url)
-
-    memfile = BytesIO()
-    memfile.write(response.content)
-    memfile.seek(0)
-
-    df = pd.read_csv(memfile, header=None, sep=" ")
+    df = pd.read_csv(url_request(url, "aus_credit"), header=None, sep=" ")
     target = df.iloc[:, -1] * 2 - 3
 
     data = df.iloc[:, :-1]
@@ -198,14 +198,7 @@ def get_banknote() -> Tuple[pd.DataFrame, pd.Series]:
             + "/data_banknote_authentication.txt"
     )
 
-    session = requests_cache.CachedSession(cache_name="statlog", expire_after=timedelta(days=1))
-    response = session.get(url)
-
-    memfile = BytesIO()
-    memfile.write(response.content)
-    memfile.seek(0)
-
-    df = pd.read_csv(memfile, header=None, sep=",")
+    df = pd.read_csv(url_request(url, "banknote"), header=None, sep=",")
     target = df.iloc[:, -1] * 2 - 1
     data = df.iloc[:, :-1]
     data.columns = ["var", "skew", "kurt", "entropy"]
@@ -247,14 +240,7 @@ def get_breast_cancer_coimbra() -> Tuple[pd.DataFrame, pd.Series]:
             + "/dataR2.csv"
     )
 
-    session = requests_cache.CachedSession(cache_name="statlog", expire_after=timedelta(days=1))
-    response = session.get(url)
-
-    memfile = BytesIO()
-    memfile.write(response.content)
-    memfile.seek(0)
-
-    df = pd.read_csv(memfile, header=0)
+    df = pd.read_csv(url_request(url, "breast_coimbra"), header=0)
     target = df.iloc[:, -1] * 2 - 1
     data = df.iloc[:, :-1]
 
@@ -301,14 +287,7 @@ def get_breast_cancer_wisconsin() -> Tuple[pd.DataFrame, pd.Series]:
             + "/breast-cancer-wisconsin.data"
     )
 
-    session = requests_cache.CachedSession(cache_name="statlog", expire_after=timedelta(days=1))
-    response = session.get(url)
-
-    memfile = BytesIO()
-    memfile.write(response.content)
-    memfile.seek(0)
-
-    df = pd.read_csv(memfile, header=None)
+    df = pd.read_csv(url_request(url, "breast_wisconsin"), header=None)
     target = df.iloc[:, -1] - 3
     data = df.iloc[:, 1:-1]
     data.columns = [
@@ -464,14 +443,7 @@ def get_german_credit() -> Tuple[pd.DataFrame, pd.Series]:
             + "/german/german.data"
     )
 
-    session = requests_cache.CachedSession(cache_name="statlog", expire_after=timedelta(days=1))
-    response = session.get(url)
-
-    memfile = BytesIO()
-    memfile.write(response.content)
-    memfile.seek(0)
-
-    df = pd.read_csv(memfile, header=None, sep=" ")
+    df = pd.read_csv(url_request(url, "german_credit"), header=None, sep=" ")
     target = df.iloc[:, -1] * 2 - 3
 
     data = df.iloc[:, :-1]
@@ -514,14 +486,7 @@ def get_haberman_survival() -> Tuple[pd.DataFrame, pd.Series]:
             + "/haberman.data"
     )
 
-    session = requests_cache.CachedSession(cache_name="statlog", expire_after=timedelta(days=1))
-    response = session.get(url)
-
-    memfile = BytesIO()
-    memfile.write(response.content)
-    memfile.seek(0)
-
-    df = pd.read_csv(memfile, header=None, sep=",")
+    df = pd.read_csv(url_request(url, "haberman_survival"), header=None, sep=",")
     target = df.iloc[:, -1]
     data = df.iloc[:, :-1]
     data.columns = ["age", "operation_year", "n_nodes"]
