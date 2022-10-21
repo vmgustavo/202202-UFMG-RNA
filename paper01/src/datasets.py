@@ -169,6 +169,7 @@ def get_australian_credit() -> Tuple[pd.DataFrame, pd.Series]:
          pd.DataFrame(encoder.fit_transform(cats)).astype("int")],
         axis=1
     )
+    data.columns = map(str, data.columns)
 
     return data, target
 
@@ -458,6 +459,7 @@ def get_german_credit() -> Tuple[pd.DataFrame, pd.Series]:
          pd.DataFrame(encoder.fit_transform(cats)).astype("int")],
         axis=1
     )
+    data.columns = map(str, data.columns)
 
     return data, target
 
