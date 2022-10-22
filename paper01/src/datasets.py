@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from sklearn import datasets
 import requests_cache
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 
 def url_request(url: str, name: str) -> BytesIO:
@@ -23,6 +23,19 @@ def url_request(url: str, name: str) -> BytesIO:
     return memfile
 
 
+def scaler(dataset: callable):
+    def wrapper() -> Tuple[pd.DataFrame, pd.Series]:
+        data, target = dataset()
+        scaler_ = StandardScaler()
+        data_scaled = pd.DataFrame(
+            data=scaler_.fit_transform(data),
+            columns=data.columns
+        )
+        return data_scaled, target
+    return wrapper
+
+
+@scaler
 def get_linear(n_obs: int = 2048, n_feats: int = 2) -> Tuple[pd.DataFrame, pd.Series]:
     data, target = datasets.make_blobs(
         n_samples=n_obs, n_features=n_feats,
@@ -33,6 +46,7 @@ def get_linear(n_obs: int = 2048, n_feats: int = 2) -> Tuple[pd.DataFrame, pd.Se
     return pd.DataFrame(data), pd.Series(target)
 
 
+@scaler
 def get_blobs(n_obs: int = 2048, n_feats: int = 2) -> Tuple[pd.DataFrame, pd.Series]:
     data, target = datasets.make_blobs(
         n_samples=n_obs, n_features=n_feats,
@@ -46,6 +60,7 @@ def get_blobs(n_obs: int = 2048, n_feats: int = 2) -> Tuple[pd.DataFrame, pd.Ser
     return pd.DataFrame(data), pd.Series(target)
 
 
+@scaler
 def get_moons(n_obs: int = 2048) -> Tuple[pd.DataFrame, pd.Series]:
     data, target = datasets.make_moons(
         n_samples=n_obs, noise=0.2,
@@ -56,6 +71,7 @@ def get_moons(n_obs: int = 2048) -> Tuple[pd.DataFrame, pd.Series]:
     return pd.DataFrame(data), pd.Series(target)
 
 
+@scaler
 def get_ilpd() -> Tuple[pd.DataFrame, pd.Series]:
     """ ILPD (Indian Liver Patient Dataset) Data Set
     Data Set Information: This data set contains 416 liver patient records and
@@ -97,6 +113,7 @@ def get_ilpd() -> Tuple[pd.DataFrame, pd.Series]:
     return data, target
 
 
+@scaler
 def get_australian_credit() -> Tuple[pd.DataFrame, pd.Series]:
     """Statlog (Australian Credit Approval) Data Set
 
@@ -174,6 +191,7 @@ def get_australian_credit() -> Tuple[pd.DataFrame, pd.Series]:
     return data, target
 
 
+@scaler
 def get_banknote() -> Tuple[pd.DataFrame, pd.Series]:
     """Data were extracted from images that were taken from genuine and forged
     banknote-like specimens. For digitization, an industrial camera usually used
@@ -207,6 +225,7 @@ def get_banknote() -> Tuple[pd.DataFrame, pd.Series]:
     return data, target
 
 
+@scaler
 def get_breast_cancer_coimbra() -> Tuple[pd.DataFrame, pd.Series]:
     """Data Set Information: There are 10 predictors, all quantitative, and a
     binary dependent variable, indicating the presence or absence of breast
@@ -248,6 +267,7 @@ def get_breast_cancer_coimbra() -> Tuple[pd.DataFrame, pd.Series]:
     return data, target
 
 
+@scaler
 def get_breast_cancer_wisconsin() -> Tuple[pd.DataFrame, pd.Series]:
     """Data Set Information: Features are computed from a digitized image of a
     fine needle aspirate (FNA) of a breast mass. They describe characteristics
@@ -289,6 +309,13 @@ def get_breast_cancer_wisconsin() -> Tuple[pd.DataFrame, pd.Series]:
     )
 
     df = pd.read_csv(url_request(url, "breast_wisconsin"), header=None)
+    df = (
+        df
+        .replace("?", np.nan)
+        .astype("float")
+        .dropna()
+    )
+
     target = df.iloc[:, -1] - 3
     data = df.iloc[:, 1:-1]
     data.columns = [
@@ -300,6 +327,7 @@ def get_breast_cancer_wisconsin() -> Tuple[pd.DataFrame, pd.Series]:
     return data, target
 
 
+@scaler
 def get_german_credit() -> Tuple[pd.DataFrame, pd.Series]:
     """Data Set Information: Two datasets are provided. the original dataset,
     in the form provided by Prof. Hofmann, contains categorical/symbolic
@@ -464,6 +492,7 @@ def get_german_credit() -> Tuple[pd.DataFrame, pd.Series]:
     return data, target
 
 
+@scaler
 def get_haberman_survival() -> Tuple[pd.DataFrame, pd.Series]:
     """Data Set Information: The dataset contains cases from a study that was
     conducted between 1958 and 1970 at the University of Chicago's Billings
