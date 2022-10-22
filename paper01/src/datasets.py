@@ -637,7 +637,9 @@ def alldts() -> dict:
         "banknote": get_banknote(),
         "breast_coimbra": get_breast_cancer_coimbra(),
         "breast_wiscons": get_breast_cancer_wisconsin(),
-        "haberman_surv": get_haberman_survival()
+        "haberman_surv": get_haberman_survival(),
+        "sonar": get_sonar(),
+        "heart": get_heart(),
     }
 
 
