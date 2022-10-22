@@ -564,6 +564,68 @@ def get_sonar() -> Tuple[pd.DataFrame, pd.Series]:
     return data, target
 
 
+@scaler
+def get_heart() -> Tuple[pd.DataFrame, pd.Series]:
+    """This dataset is a heart disease database similar to a database already
+    present in the repository (Heart Disease databases) but in a slightly
+    different form
+
+    Attribute Information:
+    ------------------------
+    -- 1. age
+    -- 2. sex
+    -- 3. chest pain type (4 values)
+    -- 4. resting blood pressure
+    -- 5. serum cholesterol in mg/dl
+    -- 6. fasting blood sugar > 120 mg/dl
+    -- 7. resting electrocardiographic results (values 0,1,2)
+    -- 8. maximum heart rate achieved
+    -- 9. exercise induced angina
+    -- 10. oldpeak = ST depression induced by exercise relative to rest
+    -- 11. the slope of the peak exercise ST segment
+    -- 12. number of major vessels (0-3) colored by flourosopy
+    -- 13. thal: 3 = normal; 6 = fixed defect; 7 = reversable defect
+
+    Variable to be predicted
+    ------------------------
+    Absence (1) or presence (2) of heart disease
+
+    Source: https://archive.ics.uci.edu/ml/datasets/Statlog+%28Heart%29
+
+    """
+
+    url = (
+            "https://archive.ics.uci.edu"
+            + "/ml/machine-learning-databases/statlog"
+            + "/heart/heart.dat"
+    )
+
+    df = pd.read_csv(url_request(url, "heart"), header=None, sep=" ")
+    target = df.iloc[:, -1] * 2 - 3
+    data = df.iloc[:, :-1]
+    data.columns = [
+        "age", "sex", "chest_pain_type", "rest_blood_pressure", "serum_cholesterol",
+        "fasting_blood_sugar", "resting_ekg", "heart_rate", "exercise_induced_angina",
+        "oldpeak", "slope_peak", "n_major_vessels", "thal",
+    ]
+
+    cats = data[[
+        "sex", "chest_pain_type", "fasting_blood_sugar", "resting_ekg",
+        "exercise_induced_angina", "thal",
+    ]]
+    conts = data[[col for col in data.columns if col not in cats.columns]]
+
+    encoder = OneHotEncoder(drop="first", sparse=False)
+    data = pd.concat(
+        [conts,
+         pd.DataFrame(encoder.fit_transform(cats)).astype("int")],
+        axis=1
+    )
+    data.columns = map(str, data.columns)
+
+    return data, target
+
+
 def alldts() -> dict:
     return {
         "synth_linear": get_linear(),
