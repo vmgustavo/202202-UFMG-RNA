@@ -525,6 +525,45 @@ def get_haberman_survival() -> Tuple[pd.DataFrame, pd.Series]:
     return data, target
 
 
+@scaler
+def get_sonar() -> Tuple[pd.DataFrame, pd.Series]:
+    """Data Set Information: The file "sonar.mines" contains 111 patterns
+    obtained by bouncing sonar signals off a metal cylinder at various angles
+    and under various conditions. The file "sonar.rocks" contains 97 patterns
+    obtained from rocks under similar conditions. The transmitted sonar signal
+    is a frequency-modulated chirp, rising in frequency. The data set contains
+    signals obtained from a variety of different aspect angles, spanning 90
+    degrees for the cylinder and 180 degrees for the rock.
+
+    Each pattern is a set of 60 numbers in the range 0.0 to 1.0. Each number
+    represents the energy within a particular frequency band, integrated over a
+    certain period of time. The integration aperture for higher frequencies
+    occur later in time, since these frequencies are transmitted later during
+    the chirp.
+
+    The label associated with each record contains the letter "R" if the object
+    is a rock and "M" if it is a mine (metal cylinder). The numbers in the
+    labels are in increasing order of aspect angle, but they do not encode the
+    angle directly.
+
+    Source: http://archive.ics.uci.edu/ml/datasets/connectionist+bench+(sonar,+mines+vs.+rocks)
+
+    """
+
+    url = (
+            "http://archive.ics.uci.edu"
+            + "/ml/machine-learning-databases/undocumented/connectionist-bench"
+            + "/sonar/sonar.all-data"
+    )
+
+    df = pd.read_csv(url_request(url, "sonar"), header=None, sep=",")
+    target = (df.iloc[:, -1] == "M").astype("int") * 2 - 1
+    data = df.iloc[:, :-1]
+    data.columns = [f"A{i}" for i in range(data.shape[1])]
+
+    return data, target
+
+
 def alldts() -> dict:
     return {
         "synth_linear": get_linear(),
