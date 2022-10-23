@@ -38,12 +38,12 @@ def repeat(n: int, neurons_steps: int = 10):
 def executor(neurons_steps: int = 10, neurons: int = None):
     datasets = ((k, v) for k, v in alldts().items())
 
-    for dataset_name, (data, target) in datasets:
-        if neurons is None:
-            num_neurons = (2 ** elem for elem in range(neurons_steps + 1, 1, -1))
-        else:
-            num_neurons = (neurons, )
+    if neurons is None:
+        num_neurons = [2 ** elem for elem in range(neurons_steps + 1, 1, -1)]
+    else:
+        num_neurons = [neurons, ]
 
+    for dataset_name, (data, target) in datasets:
         models = [
             (ELMClassifier, "ELM"),
             (ELMRegClassifier, "ELMReg"),
