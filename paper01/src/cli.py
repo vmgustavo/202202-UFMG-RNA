@@ -58,27 +58,32 @@ def executor(neurons_steps: int = 10, neurons: int = None):
                 test_size=.3, stratify=target
             )
 
-            st = time()
             try:
+                st = time()
                 model.fit(X_train, y_train)
+                time_to_fit = time() - st
+
+                pred_train = model.predict(X_train)
+                pred_test = model.predict(X_test)
+                confmat = confusion_matrix(y_test > 0, pred_test)
+
+                tn, fp, fn, tp = map(int, confmat.ravel())
+                acc_train = accuracy_score(y_train > 0, pred_train)
+                acc_test = accuracy_score(y_test > 0, pred_test)
+
+                logger.info(f"### Dataset {dataset_name:<15} | Model {model_name:>6} | Neurons {neurons:04d} ###")
+                logger.info(f"True Positive: {tp:04d} | False Negative: {fn:04d}")
+                logger.info(f"Accuracy: Train {acc_train:.04f} ; Test {acc_test:.04f}")
+                logger.info(f"Accuracy Diff: {acc_test - acc_train:+.04f}")
+
             except np.linalg.LinAlgError as e:
                 logger.info(f"### Dataset {dataset_name:<15} | Model {model_name:>6} | Neurons {neurons:04d} ###")
                 logger.info(f"Raised np.linalg.LinAlgError: {str(e)}")
-                continue
-            time_to_fit = time() - st
 
-            pred_train = model.predict(X_train)
-            pred_test = model.predict(X_test)
-            confmat = confusion_matrix(y_test > 0, pred_test)
-
-            tn, fp, fn, tp = confmat.ravel()
-            acc_train = accuracy_score(y_train > 0, pred_train)
-            acc_test = accuracy_score(y_test > 0, pred_test)
-
-            logger.info(f"### Dataset {dataset_name:<15} | Model {model_name:>6} | Neurons {neurons:04d} ###")
-            logger.info(f"True Positive: {tp:04d} | False Negative: {fn:04d}")
-            logger.info(f"Accuracy: Train {acc_train:.04f} ; Test {acc_test:.04f}")
-            logger.info(f"Accuracy Diff: {acc_test - acc_train:+.04f}")
+                time_to_fit = None
+                tn, fp, fn, tp = None, None, None, None
+                acc_train = None
+                acc_test = None
 
             results = {
                 "dataset": dataset_name,
@@ -89,8 +94,8 @@ def executor(neurons_steps: int = 10, neurons: int = None):
                     "acc_test": acc_test,
                     "time_to_fit": time_to_fit,
                     "confmat": {
-                        "true_neg": int(tn), "false_pos": int(fp),
-                        "false_neg": int(fn), "true_pos": int(tp),
+                        "true_neg": tn, "false_pos": fp,
+                        "false_neg": fn, "true_pos": tp,
                     },
                 },
             }
@@ -98,7 +103,8 @@ def executor(neurons_steps: int = 10, neurons: int = None):
             if not os.path.exists("results"):
                 os.mkdir("results")
 
-            with open(f"results/{hashlib.sha256(str(time()).encode()).hexdigest()}.json", "w") as f:
+            fname = str(time()) + model_name + dataset_name + str(neurons)
+            with open(f"results/{hashlib.sha256(fname.encode()).hexdigest()}.json", "w") as f:
                 json.dump(results, f, indent=2)
 
 
