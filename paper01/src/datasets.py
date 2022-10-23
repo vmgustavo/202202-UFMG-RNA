@@ -647,11 +647,13 @@ if __name__ == '__main__':
     # TEST FUNCTIONS EXECUTION
 
     import sys
+    from collections import Counter
     from inspect import getmembers, isfunction
 
     funcs = getmembers(sys.modules[__name__], isfunction)
     for func in filter(lambda x: x[0].startswith("get_"), funcs):
         print(func[0], end=" ")
         data_, target_ = func[1]()
+        print({k: f"{v / target_.shape[0] * 100:.02f}" for k, v in Counter(target_).items()}, end=" ")
         assert sorted(list(target_.value_counts().index)) == [-1, 1]
         print("OK")
