@@ -631,7 +631,6 @@ def alldts() -> dict:
         "synth_linear": get_linear(),
         "synth_blobs": get_blobs(),
         "synth_moons": get_moons(),
-        "ilpd": get_ilpd(),
         "cred_aus": get_australian_credit(),
         "cred_ger": get_german_credit(),
         "banknote": get_banknote(),
