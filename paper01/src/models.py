@@ -47,10 +47,9 @@ class ELMPCAClassifier(ClassifierMixin, BaseEstimator):
 
         # calculate hidden pca layer output
         pca_input = np.dot(hidden_output - self.means_, self.eig_vec_)
-        pca_output = np.tanh(pca_input)
         pca_output = np.hstack([
             np.ones(shape=(X.shape[0], 1)),
-            pca_output
+            pca_input
         ])
 
         # calculate output layer weights [store output weights]
@@ -74,10 +73,9 @@ class ELMPCAClassifier(ClassifierMixin, BaseEstimator):
 
         # calculate pca layer output
         pca_input = np.dot(hidden_output - self.means_, self.eig_vec_)
-        pca_output = np.tanh(pca_input)
         pca_output = np.hstack([
             np.ones(shape=(X.shape[0], 1)),
-            pca_output
+            pca_input
         ])
 
         # calculate output layer input values
