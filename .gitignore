@@ -181,7 +181,6 @@ vignettes/*.pdf
 
 *_files
 libs
-*.html
 .idea
 out
 *.sqlite
