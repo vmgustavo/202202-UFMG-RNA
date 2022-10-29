@@ -184,3 +184,4 @@ libs
 *.html
 .idea
 out
+*.sqlite
