@@ -17,6 +17,7 @@ tqdm = "^4.64.1"
 mlxtend = "^0.21.0"
 typer = "^0.6.1"
 requests-cache = "^0.9.6"
+umap-learn = "^0.5.3"
 
 [build-system]
 requires = ["poetry-core"]
