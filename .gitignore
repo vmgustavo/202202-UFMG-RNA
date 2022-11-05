@@ -185,3 +185,4 @@ libs
 out
 *.sqlite
 results/
+*.json

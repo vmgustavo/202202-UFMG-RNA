@@ -54,6 +54,7 @@ def executor():
             model.fit(X_train, y_train)
 
             results = dict({
+                "dataset": dataset_name,
                 "alpha": alpha,
                 "acc_train": accuracy_score(y_pred=model.predict(X_train), y_true=y_train),
                 "acc_test": accuracy_score(y_pred=model.predict(X_test), y_true=y_test),
