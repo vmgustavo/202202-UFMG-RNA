@@ -36,14 +36,14 @@ def repeat(n):
 def executor():
     selection = {"cred_aus", "cred_ger", "breast_coimbra", "sonar", "heart"}
     datasets = [(k, v) for k, v in alldts().items() if k in selection]
-    alphas = list(np.linspace(0, 20, num=6))
+    alphas = list(np.linspace(0, 20, num=15))
 
     for dataset_name, (data, target) in tqdm(datasets):
         for alpha in alphas:
             X_train, X_test, y_train, y_test = train_test_split(data.values, target.values, stratify=target, test_size=.3)
 
             model = MLPClassifier(
-                hidden_layer_sizes=(64, 32, 16, 8, 4, 2), activation="tanh", solver="adam",
+                hidden_layer_sizes=(128, 64, 32, 16, 8, 4, 2,), activation="tanh", solver="adam",
                 alpha=alpha, beta_1=0.9, beta_2=0.999,
                 max_iter=1024,
                 verbose=False, shuffle=False,
@@ -57,9 +57,11 @@ def executor():
             en = time()
 
             def feed_forward(a, b):
+                a = np.hstack([np.ones((a.shape[0], 1)), a])
                 return np.tanh(a @ b)
-            
-            projection = reduce(feed_forward, [X_train] + model.coefs_[:-1])
+
+            coefs = [np.vstack([a.reshape(1, -1), b]) for a, b in zip(model.intercepts_[:-1], model.coefs_[:-1])]
+            projection = reduce(feed_forward, [X_train] + coefs)
 
             results = dict({
                 "dataset": dataset_name,
