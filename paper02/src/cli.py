@@ -4,6 +4,7 @@ import logging
 import hashlib
 import warnings
 from time import time
+from functools import reduce
 
 import click
 import numpy as np
@@ -35,14 +36,14 @@ def repeat(n):
 def executor():
     selection = {"cred_aus", "cred_ger", "breast_coimbra", "sonar", "heart"}
     datasets = [(k, v) for k, v in alldts().items() if k in selection]
-    alphas = [0] + list(np.logspace(-1, 1/2, num=20))
+    alphas = list(np.linspace(0, 20, num=6))
 
     for dataset_name, (data, target) in tqdm(datasets):
         for alpha in alphas:
             X_train, X_test, y_train, y_test = train_test_split(data.values, target.values, stratify=target, test_size=.3)
 
             model = MLPClassifier(
-                hidden_layer_sizes=(int(2**10), ), activation="tanh", solver="adam",
+                hidden_layer_sizes=(64, 32, 16, 8, 4, 2), activation="tanh", solver="adam",
                 alpha=alpha, beta_1=0.9, beta_2=0.999,
                 max_iter=1024,
                 verbose=False, shuffle=False,
@@ -50,17 +51,27 @@ def executor():
                 n_iter_no_change=512, tol=1e-6,
                 epsilon=1e-8, learning_rate="constant",
             )
-
+            
+            st = time()
             model.fit(X_train, y_train)
+            en = time()
+
+            def feed_forward(a, b):
+                return np.tanh(a @ b)
+            
+            projection = reduce(feed_forward, [X_train] + model.coefs_[:-1])
 
             results = dict({
                 "dataset": dataset_name,
+                "time": en - st,
                 "alpha": alpha,
                 "acc_train": accuracy_score(y_pred=model.predict(X_train), y_true=y_train),
                 "acc_test": accuracy_score(y_pred=model.predict(X_test), y_true=y_test),
                 "best_loss": model.best_loss_,
                 "iterations": model.n_iter_
-            }, **cluster_evaluate(X=np.tanh(X_train @ model.coefs_[0]), labels=y_train))
+            },
+            **cluster_evaluate(X=projection, labels=y_train),
+            **{f"orig_{k}": v for k, v in cluster_evaluate(X=X_train, labels=y_train).items()})
 
             if not os.path.exists("results"):
                 os.mkdir("results")
