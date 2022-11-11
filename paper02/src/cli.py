@@ -36,14 +36,14 @@ def repeat(n):
 def executor():
     selection = {"cred_aus", "cred_ger", "breast_coimbra", "sonar", "heart"}
     datasets = [(k, v) for k, v in alldts().items() if k in selection]
-    alphas = list(np.linspace(0, 20, num=15))
+    alphas = list(np.linspace(0, 20, num=5))
 
     for dataset_name, (data, target) in tqdm(datasets):
         for alpha in alphas:
             X_train, X_test, y_train, y_test = train_test_split(data.values, target.values, stratify=target, test_size=.3)
 
             model = MLPClassifier(
-                hidden_layer_sizes=(128, 64, 32, 16, 8, 4, 2,), activation="tanh", solver="adam",
+                hidden_layer_sizes=(128, 64, 32, 16, 8, 4, 2), activation="tanh", solver="adam",
                 alpha=alpha, beta_1=0.9, beta_2=0.999,
                 max_iter=1024,
                 verbose=False, shuffle=False,
@@ -51,7 +51,7 @@ def executor():
                 n_iter_no_change=512, tol=1e-6,
                 epsilon=1e-8, learning_rate="constant",
             )
-            
+
             st = time()
             model.fit(X_train, y_train)
             en = time()
