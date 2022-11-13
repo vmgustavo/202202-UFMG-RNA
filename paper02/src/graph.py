@@ -18,14 +18,17 @@ class GabrielGraph:
         distmat = np.power(distance.squareform(distance.pdist(self.X)), 2)
         distmat[np.diag_indices(n_obs)] = np.inf
 
-        min_d = (
-            np.tile(distmat.min(axis=1).reshape(-1, 1), (1, n_obs))
-            + np.tile(distmat.min(axis=0).reshape(1, -1), (n_obs, 1))
-        )
+        adjs_i = list()
+        adjs_j = list()
+        for i in range(n_obs):
+            for j in range(n_obs):
+                minimum = np.min(distmat[i, :] + distmat[j, :])
+                if distmat[i, j] <= minimum:
+                    adjs_i.extend([i, j])
+                    adjs_j.extend([j, i])
 
-        adjs = np.where(distmat - min_d <= 0)
-        n_adjs = adjs[0].shape[0]
-        adj_mat = coo_matrix((np.ones(n_adjs), adjs), shape=(n_obs, n_obs))
+        n_adjs = len(adjs_i)
+        adj_mat = coo_matrix((np.ones(n_adjs), (adjs_i, adjs_j)), shape=(n_obs, n_obs))
 
         self.adj_mat_ = adj_mat
         return adj_mat
