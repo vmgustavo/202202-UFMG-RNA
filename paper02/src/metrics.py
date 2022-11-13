@@ -49,9 +49,6 @@ class GGMetrics:
     def gg_neigh_count(self, *args, **kwargs):  # noqa
         return np.sum(self.scores > 0) / self.scores.shape[0]
 
-    def gg_weighted_index(self, *args, **kwargs):  # noqa
-        return np.mean(self.scores * self.weights)
-
 
 def cluster_evaluate(X, labels):
     gg_metrics = GGMetrics(X, labels)
@@ -59,7 +56,6 @@ def cluster_evaluate(X, labels):
     metrics = [
         gg_metrics.gg_neigh_index,
         gg_metrics.gg_neigh_count,
-        gg_metrics.gg_weighted_index,
         silhouette_score,
         sil_neg_samples_score,
         calinski_harabasz_score,
