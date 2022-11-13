@@ -20,9 +20,6 @@ def sil_neg_samples_score(X, labels):
 
 class GGMetrics:
     def __init__(self, X, labels):
-        self.X = X
-        self.labels = labels
-
         gg = GabrielGraph(X)
         gg.adjacency()
 
@@ -30,16 +27,16 @@ class GGMetrics:
 
         scores = list()
         weights = list()
-        for i in range(self.X.shape[0]):
+        for i in range(X.shape[0]):
             neighs = self.adj_mat.getrow(i)
             indexes = neighs.tolil().rows[0]
 
-            diff_class = pd.Series(self.labels.iloc[indexes] != self.labels.iloc[i])
+            diff_class = pd.Series(labels[indexes] != labels[i])
 
             perc = diff_class.astype("int").mean()
             scores.append(perc)
 
-            obs_weights = np.sqrt(np.power(X.iloc[indexes] - X.iloc[i], 2).sum(axis=1))
+            obs_weights = np.sqrt(np.power(X[indexes] - X[i], 2).sum(axis=1))
             weight_i = np.exp(obs_weights.sum())
             weights.append(weight_i)
 
@@ -50,7 +47,7 @@ class GGMetrics:
         return np.mean(self.scores)
 
     def gg_neigh_count(self, *args, **kwargs):
-        return np.sum(self.scores > 0) / self.X.shape[0]
+        return np.sum(self.scores > 0) / self.scores.shape[0]
 
     def gg_weighted_index(self, *args, **kwargs):
         return np.mean(self.scores * self.weights)
@@ -79,4 +76,4 @@ if __name__ == '__main__':
     from datasets import get_linear
 
     data, target = get_linear(n_obs=100)
-    print(cluster_evaluate(data, target))
+    print(cluster_evaluate(data.values, target.values))
