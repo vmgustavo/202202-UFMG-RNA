@@ -26,6 +26,7 @@ warnings.filterwarnings("ignore")
 
 logger = logging.getLogger(__name__)
 
+
 @click.command()
 @click.option('-n', type=int, required=True)
 def repeat(n):
@@ -40,7 +41,10 @@ def executor():
 
     for dataset_name, (data, target) in tqdm(datasets):
         for alpha in alphas:
-            X_train, X_test, y_train, y_test = train_test_split(data.values, target.values, stratify=target, test_size=.3)
+            X_train, X_test, y_train, y_test = train_test_split(
+                data.values, target.values,
+                stratify=target, test_size=.3
+            )
 
             model = MLPClassifier(
                 hidden_layer_sizes=(128, 64, 32, 16, 8, 4, 2), activation="tanh", solver="adam",
@@ -63,17 +67,19 @@ def executor():
             coefs = [np.vstack([a.reshape(1, -1), b]) for a, b in zip(model.intercepts_[:-1], model.coefs_[:-1])]
             projection = reduce(feed_forward, [X_train] + coefs)
 
-            results = dict({
-                "dataset": dataset_name,
-                "time": en - st,
-                "alpha": alpha,
-                "acc_train": accuracy_score(y_pred=model.predict(X_train), y_true=y_train),
-                "acc_test": accuracy_score(y_pred=model.predict(X_test), y_true=y_test),
-                "best_loss": model.best_loss_,
-                "iterations": model.n_iter_
-            },
-            **cluster_evaluate(X=projection, labels=y_train),
-            **{f"orig_{k}": v for k, v in cluster_evaluate(X=X_train, labels=y_train).items()})
+            results = dict(
+                {
+                    "dataset": dataset_name,
+                    "time": en - st,
+                    "alpha": alpha,
+                    "acc_train": accuracy_score(y_pred=model.predict(X_train), y_true=y_train),
+                    "acc_test": accuracy_score(y_pred=model.predict(X_test), y_true=y_test),
+                    "best_loss": model.best_loss_,
+                    "iterations": model.n_iter_
+                },
+                **cluster_evaluate(X=projection, labels=y_train),
+                **{f"orig_{k}": v for k, v in cluster_evaluate(X=X_train, labels=y_train).items()}
+            )
 
             if not os.path.exists("results"):
                 os.mkdir("results")
