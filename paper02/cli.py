@@ -37,7 +37,7 @@ def repeat(n):
 def executor():
     selection = {"cred_aus", "cred_ger", "breast_coimbra", "sonar", "heart"}
     datasets = [(k, v) for k, v in alldts().items() if k in selection]
-    alphas = list(np.linspace(0, 20, num=5))
+    alphas = [0, 1e-3, 1e-2, 1e-1, 1e0, 2e0, 5e0, 1e1, 2e1]
 
     for dataset_name, (data, target) in tqdm(datasets):
         for alpha in alphas:
