@@ -8,7 +8,7 @@ from sklearn.metrics import (
     davies_bouldin_score,
 )
 
-from graph import GabrielGraph
+from .graph import GabrielGraph
 
 
 def sil_neg_samples_score(X, labels):
@@ -43,13 +43,13 @@ class GGMetrics:
         self.weights = np.array(weights)
         self.scores = np.array(scores)
 
-    def gg_neigh_index(self, *args, **kwargs):
+    def gg_neigh_index(self, *args, **kwargs):  # noqa
         return np.mean(self.scores)
 
-    def gg_neigh_count(self, *args, **kwargs):
+    def gg_neigh_count(self, *args, **kwargs):  # noqa
         return np.sum(self.scores > 0) / self.scores.shape[0]
 
-    def gg_weighted_index(self, *args, **kwargs):
+    def gg_weighted_index(self, *args, **kwargs):  # noqa
         return np.mean(self.scores * self.weights)
 
 
@@ -70,10 +70,3 @@ def cluster_evaluate(X, labels):
         metric.__name__: metric(X=X, labels=labels)
         for metric in metrics
     }
-
-
-if __name__ == '__main__':
-    from datasets import get_linear
-
-    data, target = get_linear(n_obs=100)
-    print(cluster_evaluate(data.values, target.values))

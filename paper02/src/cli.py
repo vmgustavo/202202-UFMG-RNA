@@ -13,8 +13,8 @@ from sklearn.metrics import accuracy_score
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import train_test_split
 
-from datasets import alldts
-from metrics import cluster_evaluate
+from .datasets import alldts
+from .metrics import cluster_evaluate
 
 logging.basicConfig(
     format='%(asctime)s | %(levelname)-8s | %(name)s | %(message)s',

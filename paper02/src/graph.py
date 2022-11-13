@@ -56,16 +56,3 @@ class GabrielGraph:
         ax.margins(0.20)
         plt.axis("off")
         plt.show()
-
-
-if __name__ == '__main__':
-    from time import time
-    from datasets import get_linear
-
-    data, target = get_linear(n_obs=100)
-    gg = GabrielGraph(X=data)
-    st = time()
-    gg.adjacency()
-    print(time() - st)
-
-    gg.plot()

@@ -19,6 +19,7 @@ typer = "^0.6.1"
 requests-cache = "^0.9.6"
 umap-learn = "^0.5.3"
 networkx = "^2.8.8"
+pytest = "^7.2.0"
 
 [build-system]
 requires = ["poetry-core"]

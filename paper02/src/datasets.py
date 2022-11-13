@@ -23,8 +23,8 @@ def url_request(url: str, name: str) -> BytesIO:
     return memfile
 
 
-def scaler(dataset: callable, *args, **kwargs):
-    def wrapper(*args, **kwargs) -> Tuple[pd.DataFrame, pd.Series]:
+def scaler(dataset: callable, *args, **kwargs):  # noqa
+    def wrapper(*args, **kwargs) -> Tuple[pd.DataFrame, pd.Series]:  # noqa
         data, target = dataset(*args, **kwargs)
         scaler_ = StandardScaler()
         data_scaled = pd.DataFrame(
