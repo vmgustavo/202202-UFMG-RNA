@@ -41,7 +41,7 @@ class GGMetrics:
         return np.mean(self.scores)
 
     def gg_neigh_count(self, *args, **kwargs):  # noqa
-        return np.sum(self.scores > 0) / self.scores.shape[0]
+        return np.sum(self.scores > 0.5) / self.scores.shape[0]
 
 
 def cluster_evaluate(X, labels):
