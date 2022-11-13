@@ -26,7 +26,6 @@ class GGMetrics:
         self.adj_mat = gg.adj_mat_
 
         scores = list()
-        weights = list()
         for i in range(X.shape[0]):
             neighs = self.adj_mat.getrow(i)
             indexes = neighs.tolil().rows[0]
@@ -36,11 +35,6 @@ class GGMetrics:
             perc = diff_class.astype("int").mean()
             scores.append(perc)
 
-            obs_weights = np.sqrt(np.power(X[indexes] - X[i], 2).sum(axis=1))
-            weight_i = np.exp(obs_weights.sum())
-            weights.append(weight_i)
-
-        self.weights = np.array(weights)
         self.scores = np.array(scores)
 
     def gg_neigh_index(self, *args, **kwargs):  # noqa
