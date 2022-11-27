@@ -569,12 +569,155 @@ It represents seismic activity from France since 1962 analysed by geophysical ex
 **(b)** - Class-quality graph
 **(c)** - Proposed representation of topological interactions between classes
 
-<br>
+</div>
+</div>
 
+---
 
+<!-- _class: text -->
+
+### Experiments
+#### Results: Iris
+
+- **No isolated** data in any class
+- **Single conected component**
+- **No overlap** despite what the 2 principal components projection shows
+- St-Vs and St-Vg are **linearly separable** while Vs-Vg is **non-linearly separable**
+- The **contact area** of the classes **vary significantly**
+- There is a **single border component** in each class connected to both other classes
+
+---
+
+<!-- _class: text -->
+
+<style scoped>
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 1px 0.65fr;
+}
+</style>
+
+### Experiments
+#### Results: Seismic
+
+<div class="rect-bottom"></div>
+
+<div class="columns">
+<div>
+
+![w:650](img/seismic_projection.png)
+
+</div>
+<div>
+
+</div>
+<div>
+
+- Linear projections are **misleading**
+- The classification problem is **simpler** than the linear projection show
 
 </div>
 </div>
+
+---
+
+<!-- _class: text -->
+
+<style scoped>
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+}
+</style>
+
+<div class="rect-bottom"></div>
+
+<div class="columns">
+<div>
+
+### Experiments
+#### Results: Seismic
+
+- There are 2 distinct components and only 5 isolated data
+- Some of the **isolated data** was later confirmed to be **mislabeled**
+
+</div>
+<div>
+
+</div>
+<div>
+
+![w:650](img/seismic_graph.png)
+
+</div>
+</div>
+
+---
+
+<!-- _class: title -->
+<!-- _paginate: false -->
+
+# Discussion
+
+---
+
+<!-- _class: text -->
+
+<style scoped>
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 100px 1fr;
+}
+</style>
+
+### Discussion
+#### Gabrie Graph $\times$ Delaunay Graph
+
+<div class="rect-bottom"></div>
+
+<div class="columns">
+<div>
+
+- GG is the most complete subgraph of DG
+- The **farther** the graph from the DG $\rightarrow$ **worse** the correspondence between the topology of the graph and the topology of the data $\rightarrow$ **lower** the relevance of the topological analysis
+- With **increasing dimension** GG gets **close enough** to DG $\rightarrow$ GG becomes more useful than DG since DG is untractable in high dimensions
+
+</div>
+<div>
+
+</div>
+<div>
+
+- The probability to get a non-acute triangle decreases exponentially with the dimension 
+  $\rightarrow$ GG links all sides of non-acute triangle
+  $\rightarrow$ The probability for the GG to be identical to the DG tends towards 1
+  $\rightarrow$ Whenever the DG is not tractable, the GG provides a good approximation
+
+</div>
+</div>
+
+---
+
+<!-- _class: text -->
+
+### Discussion
+#### The curse of dimension
+
+- In higher-dimensional spaces, all the points seems to be *equidistant* from each others
+- Dimension between 10 and 50 is where the effects of the curse of dimension appear through the saturation effect
+
+---
+
+<!-- _class: text -->
+
+### Discussion
+#### Conclusion
+
+- Topology representing graphs makes explicit the neighbohood relation between the data
+- Exploring the topology of the data $\leftrightarrow$ exploring the topology of the graph
+- Delaunay graph is the methodology which best preserves de topology of the classes related to the Nearest Neighbor classifier
+- Gabriel Graph is a good aproximation of Delaunay Graph in high dimensional space
+- The class-quality graph provides a summary visualization of the data topology
 
 ---
 
