@@ -380,9 +380,9 @@ $$
 
 ![center](img/topological_quality.png)
 
-(a) - **Normal**: all of its neighbors have the same label as its own
-(b) - **Border**: at least one of its neighbors has a different label than its own
-(c) - **Isolated**: all of its neighbors have a different label than its own
+**(a)** - **Normal**: all of its neighbors have the same label as its own
+**(b)** - **Border**: at least one of its neighbors has a different label than its own
+**(c)** - **Isolated**: all of its neighbors have a different label than its own
 
 </div>
 </div>
@@ -405,10 +405,10 @@ img[alt~="center"] {
 
 <div class="rect-bottom"></div>
 
-(a) - Original data with no linkw between classes;
-(b) - Class graph;
-(c) - Original data with no links between classes and no links between different quality names (normal, isolated, border) within each class;
-(d) - Class-quality graph.
+**(a)** - Original data with no links between classes;
+**(b)** - Class graph;
+**(c)** - Original data with no links between classes and no links between different quality names (normal, isolated, border) within each class;
+**(d)** - Class-quality graph.
 
 ---
 
@@ -458,6 +458,123 @@ img[alt~="center"] {
 <!-- _paginate: false -->
 
 # Experiments
+
+---
+
+<!-- _class: text -->
+
+<style scoped>
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 100px 1fr;
+}
+</style>
+
+### Experiments
+#### Datasets
+
+<div class="rect-bottom"></div>
+
+<div class="columns">
+<div>
+
+## Iris
+
+It describes the type of Iris plants based on sepal and petal features
+- 150 observations
+- 50 versicolor, 50 setosa and 50 virginica
+- 4 attributes
+
+</div>
+<div>
+
+</div>
+<div>
+
+## Seismic
+
+It represents seismic activity from France since 1962 analysed by geophysical experts
+- 2105 observations
+- 1348 natural and 757 artificial events
+- 5 attributes
+
+</div>
+</div>
+
+---
+
+<!-- _class: text -->
+
+<style scoped>
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 1px 0.65fr;
+}
+</style>
+
+### Experiments
+#### Results: Iris
+
+<div class="rect-bottom"></div>
+
+<div class="columns">
+<div>
+
+![w:650](img/iris_projection.png)
+
+</div>
+<div>
+
+</div>
+<div>
+
+**(a)** - Linear 2D projection shows **clear overlap** between classes Versicolor (circles) and Virginica (asterisk)
+**(b)** - Non-linear 3D projection shows **no overlap**
+
+<br>
+
+**Contradictory conclusions** from the projections suggests that **using only projections** might not be a good strategy for exploratory analysis.
+
+</div>
+</div>
+
+---
+
+<!-- _class: text -->
+
+<style scoped>
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 1px 0.65fr;
+}
+</style>
+
+### Experiments
+#### Results: Iris
+
+<div class="rect-bottom"></div>
+
+<div class="columns">
+<div>
+
+![w:650](img/iris_graphs.png)
+
+</div>
+<div>
+
+</div>
+<div>
+
+**(a)** - Class graph
+**(b)** - Class-quality graph
+**(c)** - Proposed representation of topological interactions between classes
+
+<br>
+
+
+
+</div>
+</div>
 
 ---
 
