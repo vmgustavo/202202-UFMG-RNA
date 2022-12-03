@@ -36,7 +36,7 @@ class GGMetrics:
     def gg_class_quality(self):
         return (
             self.quality
-            .groupby(["target", "quality"])
+            .groupby(["target", "quality"], as_index=False)
             .agg({"quality": "count"})
         )
 
