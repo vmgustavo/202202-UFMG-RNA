@@ -8,7 +8,7 @@ from sklearn.metrics import (
     davies_bouldin_score,
 )
 
-from .graph import GabrielGraph
+from .graph import GabrielGraph, Topology
 
 
 def sil_neg_samples_score(X, labels):
@@ -21,27 +21,20 @@ def sil_neg_samples_score(X, labels):
 class GGMetrics:
     def __init__(self, X, labels):
         gg = GabrielGraph(X)
-        gg.adjacency()
-
-        self.adj_mat = gg.adj_mat_
-
-        scores = list()
-        for i in range(X.shape[0]):
-            neighs = self.adj_mat.getrow(i)
-            indexes = neighs.tolil().rows[0]
-
-            diff_class = pd.Series(labels[indexes] != labels[i])
-
-            perc = diff_class.astype("int").mean()
-            scores.append(perc)
-
-        self.scores = np.array(scores)
+        adj_mat = gg.adjacency()
+        tpl = Topology(X, labels, adj_mat)
+        self.quality = tpl.class_quality()
+        self.scores = np.array(self.quality["link_prop"].values)
 
     def gg_neigh_index(self, *args, **kwargs):  # noqa
         return np.mean(self.scores)
 
-    def gg_neigh_count(self, *args, **kwargs):  # noqa
-        return np.sum(self.scores > 0.5) / self.scores.shape[0]
+    def gg_class_quality(self):
+        return (
+            self.quality
+            .groupby(["target", "quality"])
+            .agg({"quality": "count"})
+        )
 
 
 def cluster_evaluate(X, labels):
@@ -49,7 +42,6 @@ def cluster_evaluate(X, labels):
 
     metrics = [
         gg_metrics.gg_neigh_index,
-        gg_metrics.gg_neigh_count,
         silhouette_score,
         sil_neg_samples_score,
         calinski_harabasz_score,
