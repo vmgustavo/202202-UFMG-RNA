@@ -18,3 +18,13 @@ def test_gabriel_graph():
     gg.adjacency()
 
     gg.plot()
+
+
+def test_graph_quality():
+    from src.datasets import get_blobs
+    from src.metrics import GGMetrics
+
+    data, target = get_blobs(n_obs=100)
+
+    ggm = GGMetrics(data, target)
+    ggm.gg_border_perc()

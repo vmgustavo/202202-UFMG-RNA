@@ -28,6 +28,11 @@ class GGMetrics:
     def gg_neigh_index(self, *args, **kwargs):  # noqa
         return np.mean(self.scores)
 
+    def gg_border_perc(self, *args, **kwargs):  # noqa
+        test = (self.quality["quality"] == "border").values
+        counts = Counter(test)
+        return counts[True] / test.shape[0]
+
     def gg_class_quality(self):
         return (
             self.quality
@@ -41,6 +46,7 @@ def cluster_evaluate(X, labels):
 
     metrics = [
         gg_metrics.gg_neigh_index,
+        gg_metrics.gg_border_perc,
         silhouette_score,
         sil_neg_samples_score,
         calinski_harabasz_score,
