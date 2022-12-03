@@ -56,3 +56,36 @@ class GabrielGraph:
         ax.margins(0.20)
         plt.axis("off")
         plt.show()
+
+
+class Topology:
+    def __init__(self, data: pd.DataFrame, target: pd.Series, adjacency: coo_matrix):
+        self.data = data
+        self.target = target
+        self.adjacency = adjacency
+
+    @staticmethod
+    def get_quality(curr_obs: int, adjacency: coo_matrix, target_: pd.Series):
+        class_links = target_[np.where((adjacency.getcol(curr_obs) > 0).toarray())[0]]
+        return pd.DataFrame(class_links == target_[curr_obs]).astype("int").mean().iloc[0]
+
+    def executor(self, x):
+        return self.get_quality(x, self.adjacency, self.target)
+
+    def class_quality(self):
+        with Pool() as pool:
+            results = pool.map(self.executor, range(self.data.shape[0]))
+
+        class_quality = pd.DataFrame([self.target, pd.Series(results)]).transpose()
+        class_quality.columns = ["target", "link_prop"]
+
+        def quality(x: float):
+            if x == 0:
+                return "isolated"
+            elif x == 1:
+                return "normal"
+            else:
+                return "border"
+
+        class_quality["quality"] = class_quality["link_prop"].apply(quality)
+        return class_quality
