@@ -10,7 +10,6 @@ from dataclasses import dataclass
 import click
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
 from sklearn.metrics import accuracy_score
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import train_test_split
@@ -93,8 +92,9 @@ def executor():
     datasets = [(k, v) for k, v in alldts().items() if k in selection]
     alphas = np.logspace(0, 1, 100)
 
-    for dataset_name, (data, target) in tqdm(datasets):
+    for dataset_name, (data, target) in datasets:
         for alpha in alphas:
+            logging.info(f"dataset: {dataset_name:>15} | alpha: {alpha:02.02f}")
             res = exec_nn(
                 data, target,
                 hidden_layer_sizes=(128, 128, 128, 128, 128), reg_alpha=alpha,
