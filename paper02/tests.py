@@ -28,3 +28,4 @@ def test_graph_quality():
 
     ggm = GGMetrics(data, target)
     ggm.gg_border_perc()
+    ggm.gg_class_quality()
