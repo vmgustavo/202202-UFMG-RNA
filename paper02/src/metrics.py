@@ -1,7 +1,6 @@
 from collections import Counter
 
 import numpy as np
-import pandas as pd
 from sklearn.metrics import (
     silhouette_samples, silhouette_score,
     calinski_harabasz_score,
