@@ -102,6 +102,7 @@ def executor():
 
             results = dict(
                 {
+                    "dataset": dataset_name,
                     "alpha": alpha,
                     "acc_train": accuracy_score(y_pred=res.pred_train, y_true=res.y_train),
                     "acc_test": accuracy_score(y_pred=res.pred_test, y_true=res.y_test),
