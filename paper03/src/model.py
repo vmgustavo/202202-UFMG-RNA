@@ -1,23 +1,28 @@
+from typing import Tuple
+
 import torch
 
 
 class FeedForward(torch.nn.Module):
-    def __init__(self, input_size, hidden_size):
+    def __init__(self, input_size: int, hidden_sizes: Tuple[int, ...], output_size: int):
         super(FeedForward, self).__init__()
 
-        self.input_size = input_size
-        self.hidden_size = hidden_size
-        self.fc1 = torch.nn.Linear(self.input_size, self.hidden_size)
-        self.activation = torch.nn.modules.activation.Tanh()
-        self.fc2 = torch.nn.Linear(self.hidden_size, 1)
-        self.sigmoid = torch.nn.Sigmoid()
+        sizes = (input_size, ) + hidden_sizes
+
+        self.layers = torch.nn.ModuleList()
+        for size_in, size_out in zip(sizes[::1], sizes[1::1]):
+            self.layers.append(torch.nn.Linear(size_in, size_out))
+            self.layers.append(torch.nn.modules.activation.Tanh())
+
+        self.layers.append(torch.nn.Linear(sizes[-1], output_size))
+        self.layers.append(torch.nn.Sigmoid())
 
     def forward(self, x):
-        hidden = self.fc1(x)
-        activation = self.activation(hidden)
-        output = self.fc2(activation)
-        output = self.sigmoid(output)
-        return output
+        values = x
+        for layer in self.layers:
+            values = layer(values)
+
+        return values
 
 
 class TorchMLP:
@@ -29,7 +34,7 @@ class TorchMLP:
         self.criterion = torch.nn.modules.loss.BCELoss()
 
     def fit(self, X, y):
-        self.model_ = FeedForward(input_size=X.shape[1], hidden_size=100)
+        self.model_ = FeedForward(input_size=X.shape[1], hidden_sizes=(256, 256, 64), output_size=1)
         optimizer = torch.optim.Adam(self.model_.parameters(), lr=0.01)
 
         tensor_x = torch.FloatTensor(X)
