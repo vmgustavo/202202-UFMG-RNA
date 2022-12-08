@@ -2,6 +2,8 @@ from typing import Tuple
 
 import torch
 
+from torch_custom import get_silhouettes
+
 
 class FeedForward(torch.nn.Module):
     def __init__(self, input_size: int, hidden_sizes: Tuple[int, ...], output_size: int):
@@ -20,6 +22,13 @@ class FeedForward(torch.nn.Module):
     def forward(self, x):
         values = x
         for layer in self.layers:
+            values = layer(values)
+
+        return values
+
+    def projection(self, x):
+        values = x
+        for layer in self.layers[:-2]:
             values = layer(values)
 
         return values
@@ -62,6 +71,63 @@ class TorchMLP:
         return self.model_(torch.FloatTensor(X))
 
 
+class SilWeightedBCELoss(torch.nn.Module):
+    def __init__(self, thresh: float = 0.5):
+        super().__init__()
+        assert 0 < thresh < 1, f"'thresh' must be in range (0, 1)"
+        self.thresh = thresh
+        self.history = list()
+
+    def forward(self, inputs: torch.Tensor, targets: torch.Tensor, projection: torch.Tensor):
+        silhouettes = get_silhouettes(projection, targets).detach()
+        silhouettes.requires_grad = False
+        silhouette_weights = 1 - torch.pow(silhouettes, 2)
+        self.history.append(torch.mean(silhouette_weights).item())
+
+        loss = torch.nn.modules.loss.BCELoss(weight=silhouette_weights)(inputs, targets)
+        return torch.mean(torch.multiply(loss, silhouette_weights)).detach()
+
+
+class TorchMLPTopologyLoss(TorchMLP):
+    model_: FeedForward
+    loss_: list
+
+    def __init__(self, n_epoch: int, hidden_sizes: Tuple[int, ...] = (256, 256, 64)):
+        super(TorchMLPTopologyLoss, self).__init__(n_epoch, hidden_sizes)
+
+    def fit(self, X, y):
+        self.model_ = FeedForward(input_size=X.shape[1], hidden_sizes=self.hidden_sizes, output_size=1)
+        optimizer = torch.optim.Adam(self.model_.parameters(), lr=0.01)
+
+        tensor_x = torch.FloatTensor(X)
+        tensor_y = torch.FloatTensor(y)
+
+        self.loss_ = list()
+        self.model_.train()
+
+        loss_function = SilWeightedBCELoss(thresh=0.5)
+        for epoch in range(self.n_epoch):
+            optimizer.zero_grad()
+            loss = loss_function(
+                inputs=self.model_(tensor_x).squeeze(),
+                targets=tensor_y,
+                projection=self.model_.projection(tensor_x)
+            )
+            loss.requires_grad = True
+            loss.backward()
+            optimizer.step()
+            self.loss_.append(loss.item())
+
+        return self
+
+    def predict(self, X, threshold: float = 0.5):
+        return self.predict_proba(X) > threshold
+
+    def predict_proba(self, X):
+        self.model_.eval()
+        return self.model_(torch.FloatTensor(X))
+
+
 if __name__ == '__main__':
     import numpy as np
     from sklearn import datasets
@@ -78,6 +144,12 @@ if __name__ == '__main__':
     )
     target = np.isin(target, [0, 1]) * 2 - 1
     X_train, X_test, y_train, y_test = train_test_split(data, target, test_size=0.3)
+
+    model = TorchMLPTopologyLoss(n_epoch=1000)
+    model.fit(X_train, y_train > 0)
+
+    y_pred = model.predict(X_test)
+    print(accuracy_score(y_test > 0, y_pred > 0))
 
     model = TorchMLP(n_epoch=500)
     model.fit(X_train, y_train > 0)
