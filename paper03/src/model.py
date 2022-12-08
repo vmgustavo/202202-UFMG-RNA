@@ -29,11 +29,12 @@ class TorchMLP:
     model_: FeedForward
     loss_: list
 
-    def __init__(self, n_epoch: int):
+    def __init__(self, n_epoch: int, hidden_sizes: Tuple[int, ...] = (256, 256, 64)):
         self.n_epoch = n_epoch
+        self.hidden_sizes = hidden_sizes
 
     def fit(self, X, y):
-        self.model_ = FeedForward(input_size=X.shape[1], hidden_sizes=(256, 256, 64), output_size=1)
+        self.model_ = FeedForward(input_size=X.shape[1], hidden_sizes=self.hidden_sizes, output_size=1)
         optimizer = torch.optim.Adam(self.model_.parameters(), lr=0.01)
 
         tensor_x = torch.FloatTensor(X)
