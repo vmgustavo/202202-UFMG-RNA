@@ -31,7 +31,6 @@ class TorchMLP:
 
     def __init__(self, n_epoch: int):
         self.n_epoch = n_epoch
-        self.criterion = torch.nn.modules.loss.BCELoss()
 
     def fit(self, X, y):
         self.model_ = FeedForward(input_size=X.shape[1], hidden_sizes=(256, 256, 64), output_size=1)
@@ -44,7 +43,10 @@ class TorchMLP:
         self.model_.train()
         for epoch in range(self.n_epoch):
             optimizer.zero_grad()
-            loss = self.criterion(self.model_(tensor_x).squeeze(), tensor_y)
+            loss = torch.nn.modules.loss.BCELoss()(
+                self.model_(tensor_x).squeeze(),
+                tensor_y
+            )
             loss.backward()
             optimizer.step()
             self.loss_.append(loss.item())
