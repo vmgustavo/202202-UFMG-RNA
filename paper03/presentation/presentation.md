@@ -182,7 +182,7 @@ p { font-size: 50px; }
 <style scoped>
 .columns {
   display: grid;
-  grid-template-columns: 1fr 100px 1fr;
+  grid-template-columns: 1fr 100px 0.9fr;
 }
 </style>
 
@@ -224,7 +224,7 @@ p { font-size: 50px; }
 <style scoped>
 .columns {
   display: grid;
-  grid-template-columns: 1fr 100px 0.6fr;
+  grid-template-columns: 1fr 100px 0.55fr;
 }
 </style>
 
